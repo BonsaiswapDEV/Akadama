@@ -1,6 +1,7 @@
+// SPDX-License-Identifier: MIT
 // File: @openzeppelin/contracts-upgradeable@4.8.2/utils/StorageSlotUpgradeable.sol
 
-// SPDX-License-Identifier: MIT
+
 // OpenZeppelin Contracts (last updated v4.7.0) (utils/StorageSlot.sol)
 
 pragma solidity ^0.8.0;
@@ -2531,7 +2532,7 @@ abstract contract ERC20BurnableUpgradeable is Initializable, ContextUpgradeable,
     uint256[50] private __gap;
 }
 
-// File: contracts/AKADAMA.sol
+// File: AKADAMA.sol
 
 
 pragma solidity ^0.8.9;
@@ -2559,16 +2560,8 @@ contract AKADAMA is Initializable, ERC20Upgradeable, ERC20BurnableUpgradeable, O
         _mint(msg.sender, 300000000 * 10 ** decimals());
     }
 
-    function mint(address to, uint256 amount) public onlyOwner {
-        _mint(to, amount);
-    }
-
-
     function transfer(address to, uint256 amount) public override returns (bool) {
         address owner = _msgSender();
-        if (timestampLockedFunds[owner] != 0){
-            require(block.timestamp > timestampLockedFunds[owner], "Your funds are lock, check the timestampLockedFunds mapping to know your timelock");
-        }
         _transfer(owner, to, amount);
         return true;
     }
@@ -2579,22 +2572,9 @@ contract AKADAMA is Initializable, ERC20Upgradeable, ERC20BurnableUpgradeable, O
     uint256 amount
     ) public override returns (bool) {
         address spender = _msgSender();
-        if (timestampLockedFunds[from] != 0){
-            require(block.timestamp > timestampLockedFunds[from], "Your funds are lock, check the timestampLockedFunds mapping to know your timelock");
-        }
         _spendAllowance(from, spender, amount);
         _transfer(from, to, amount);
         return true;
-    }
-
-    function lockFunds(address to, uint256 timestamp) public onlyOwner {
-        require(timestampLockedFunds[to] == 0, "The funds are already locked");
-        timestampLockedFunds[to] = timestamp;
-    }
-
-    function unlockFunds(address to) public onlyOwner {
-        require(timestampLockedFunds[to] != 0, "The funds are not already locked");
-        timestampLockedFunds[to] = 0;
     }
 
     function _authorizeUpgrade(address newImplementation)
